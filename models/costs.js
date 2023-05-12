@@ -1,5 +1,6 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
+// Costs schema creation
 const costSchema = new mongoose.Schema({
   user_id: { type: Number, required: true },
   year: { type: Number, required: true },
@@ -10,13 +11,13 @@ const costSchema = new mongoose.Schema({
   category: {
     type: String,
     enum: [
-      "food",
-      "health",
-      "housing",
-      "sport",
-      "education",
-      "transportation",
-      "other",
+      'food',
+      'health',
+      'housing',
+      'sport',
+      'education',
+      'transportation',
+      'other',
     ],
     required: true,
   },
@@ -24,12 +25,12 @@ const costSchema = new mongoose.Schema({
 });
 
 // Define a virtual field for the computed pattern
-costSchema.virtual("computed").get(function () {
+costSchema.virtual('computed').get(function () {
   const category = this.category;
   const total = this.sum;
   return { [category]: total };
 });
 
-const Cost = mongoose.model("Cost", costSchema);
+const Cost = mongoose.model('Cost', costSchema);
 
 module.exports = Cost;

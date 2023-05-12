@@ -1,13 +1,13 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const Cost = require("./models/cost");
-const User = require("./models/user");
+const Costs = require('./models/costs');
+const User = require('./models/user');
 
 // Add a new cost item
-router.post("/addcost", async (req, res) => {
+router.post('/addcost', async (req, res) => {
   const { user_id, year, month, day, id, description, category, sum } =
     req.body;
-  const cost = new Cost({
+  const cost = new Costs({
     user_id,
     year,
     month,
@@ -22,12 +22,12 @@ router.post("/addcost", async (req, res) => {
     res.json(cost);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
+    res.status(500).send('Server Error');
   }
 });
 
 // Get detailed report for a specific month and year
-router.get("/report/:year/:month/:user_id", async (req, res) => {
+router.get('/report/:year/:month/:user_id', async (req, res) => {
   const { year, month, user_id } = req.params;
   const pipeline = [
     {
@@ -39,16 +39,16 @@ router.get("/report/:year/:month/:user_id", async (req, res) => {
     },
     {
       $group: {
-        _id: "$category",
+        _id: '$category',
         costs: {
           $push: {
-            user_id: "$user_id",
-            year: "$year",
-            month: "$month",
-            id: "$_id",
-            description: "$description",
-            category: "$category",
-            sum: "$sum",
+            user_id: '$user_id',
+            year: '$year',
+            month: '$month',
+            id: '$_id',
+            description: '$description',
+            category: '$category',
+            sum: '$sum',
           },
         },
       },
@@ -58,13 +58,13 @@ router.get("/report/:year/:month/:user_id", async (req, res) => {
     const result = await Cost.aggregate(pipeline);
     const report = {};
     const categories = [
-      "food",
-      "health",
-      "housing",
-      "sport",
-      "education",
-      "transportation",
-      "other",
+      'food',
+      'health',
+      'housing',
+      'sport',
+      'education',
+      'transportation',
+      'other',
     ];
     categories.forEach((category) => {
       report[category] = [];
@@ -75,24 +75,24 @@ router.get("/report/:year/:month/:user_id", async (req, res) => {
     res.json(report);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
+    res.status(500).send('Server Error');
   }
 });
 
 // Get information about the developers
-router.get("/about", (req, res) => {
+router.get('/about', (req, res) => {
   const developers = [
     {
-      first_name: "John",
-      last_name: "Doe",
+      first_name: 'John',
+      last_name: 'Doe',
       id: 1,
-      email: "john.doe@example.com",
+      email: 'john.doe@example.com',
     },
     {
-      first_name: "Jane",
-      last_name: "Doe",
+      first_name: 'Jane',
+      last_name: 'Doe',
       id: 2,
-      email: "jane.doe@example.com",
+      email: 'jane.doe@example.com',
     },
   ];
 
