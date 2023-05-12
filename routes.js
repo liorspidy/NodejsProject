@@ -5,94 +5,81 @@ const User = require('./models/user');
 
 // Add a new cost item
 router.post('/addcost', async (req, res) => {
-  const { user_id, year, month, day, id, description, category, sum } =
-    req.body;
+  const { user_id, year, month, day, description, category, sum } = req.body;
+
+  // Check if the user exists
+  const user = await User.findOne({ id: user_id });
+  if (!user) {
+    return res.status(400).send('User not found');
+  }
+
+  // Create a new cost
   const cost = new Costs({
     user_id,
     year,
     month,
     day,
-    id,
     description,
     category,
     sum,
   });
+
   try {
     await cost.save();
-    res.json(cost);
+    res.status(200).send('Cost added successfully');
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server Error');
+    res.status(500).send('Could not add cost successfully');
   }
 });
 
 // Get detailed report for a specific month and year
-router.get('/report/:year/:month/:user_id', async (req, res) => {
-  const { year, month, user_id } = req.params;
-  const pipeline = [
-    {
-      $match: {
-        user_id: parseInt(user_id),
-        year: parseInt(year),
-        month: parseInt(month),
-      },
-    },
-    {
-      $group: {
-        _id: '$category',
-        costs: {
-          $push: {
-            user_id: '$user_id',
-            year: '$year',
-            month: '$month',
-            id: '$_id',
-            description: '$description',
-            category: '$category',
-            sum: '$sum',
-          },
-        },
-      },
-    },
+router.get('/report', async (req, res) => {
+  const { year, month, user_id } = req.query;
+
+  const costs = await Costs.find({
+    user_id,
+    year,
+    month,
+  });
+
+  const categories = [
+    'food',
+    'health',
+    'housing',
+    'sport',
+    'education',
+    'transportation',
+    'other',
   ];
-  try {
-    const result = await Cost.aggregate(pipeline);
-    const report = {};
-    const categories = [
-      'food',
-      'health',
-      'housing',
-      'sport',
-      'education',
-      'transportation',
-      'other',
-    ];
-    categories.forEach((category) => {
-      report[category] = [];
-    });
-    result.forEach((item) => {
-      report[item._id] = item.costs;
-    });
-    res.json(report);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
-  }
+
+  const report = categories.reduce((acc, category) => {
+    acc[category] = [];
+    return acc;
+  }, {});
+
+  costs.forEach((cost) => {
+    const { category } = cost;
+    report[category].push(cost);
+  });
+
+  res.json(report);
 });
 
 // Get information about the developers
 router.get('/about', (req, res) => {
   const developers = [
     {
-      first_name: 'John',
-      last_name: 'Doe',
-      id: 1,
-      email: 'john.doe@example.com',
+      first_name: 'Lior',
+      last_name: 'Fridman',
+      id: 206798902,
+      email: 'liorspidy@gmail.com',
     },
     {
-      first_name: 'Jane',
-      last_name: 'Doe',
-      id: 2,
-      email: 'jane.doe@example.com',
+      first_name: 'Daniel',
+      last_name: 'Gardashnik',
+      id: 206389363,
+      email: 'danielgard10@gmail.com',
     },
   ];
 
