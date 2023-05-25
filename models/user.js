@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// create a new users schema with the given parameters
 const userSchema = new mongoose.Schema({
   id: { type: Number, required: true },
   first_name: { type: String, required: true },

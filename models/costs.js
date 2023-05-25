@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// create a new costs schema with the given parameters
 const costSchema = new mongoose.Schema({
   id: { type: Number, unique: true },
   user_id: { type: Number, required: true },
@@ -23,6 +24,7 @@ const costSchema = new mongoose.Schema({
   sum: { type: Number, required: true },
 });
 
+// make the id increment for each instance
 costSchema.pre('save', async function (next) {
   if (this.isNew) {
     const maxCost = await Cost.findOne().sort({ id: -1 });
