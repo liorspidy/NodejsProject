@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const costSchema = new mongoose.Schema({
+  id: { type: Number, unique: true },
   user_id: { type: Number, required: true },
   year: { type: Number, required: true },
   month: { type: Number, required: true },
@@ -22,15 +23,13 @@ const costSchema = new mongoose.Schema({
   sum: { type: Number, required: true },
 });
 
-costSchema.add({ id: mongoose.Types.ObjectId });
-
-costSchema.virtual('computed').get(function () {
-  const category = this.category;
-  const total = this.sum;
-  return { [category]: total };
+costSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    const maxCost = await Cost.findOne().sort({ id: -1 });
+    this.id = maxCost ? maxCost.id + 1 : 1;
+  }
+  next();
 });
-
-costSchema.index({ category: 1 });
 
 const Cost = mongoose.model('Cost', costSchema);
 
