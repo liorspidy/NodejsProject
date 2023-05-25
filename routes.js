@@ -3,6 +3,7 @@ const router = express.Router();
 const Costs = require('./models/costs');
 const User = require('./models/user');
 const createdReports = require('./models/createdReports');
+
 // Add a new cost item
 router.post('/addcost', async (req, res) => {
   const { user_id, year, month, day, description, category, sum } = req.body;
@@ -55,6 +56,14 @@ router.post('/addcost', async (req, res) => {
   }
   if (!isValidDay(year, month, day)) {
     return res.status(400).send('Invalid day');
+  }
+
+  // Delete existing createdReport if it exists
+  try {
+    await createdReports.findOneAndDelete({ user_id, year, month });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Could not delete existing createdReport');
   }
 
   // Create a new cost
